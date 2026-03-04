@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Survey Distribution Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --ink: #1f222a;
+      --ink-muted: #636875;
+      --card: #fffdf8;
+      --accent: #2468f2;
+      --accent-soft: #d8e5ff;
+      --line: rgba(31, 34, 42, 0.12);
+      --shadow: 0 10px 35px rgba(36, 59, 102, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 800px at 95% -15%, #ffe5d2 0%, rgba(255, 229, 210, 0) 58%),
+        radial-gradient(900px 700px at -10% 15%, #d8e5ff 0%, rgba(216, 229, 255, 0) 62%),
+        var(--bg);
+      padding: 2rem 1.2rem 3rem;
+    }
+
+    .dashboard {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      gap: 1.2rem;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(255, 253, 248, 0.9), rgba(255, 253, 248, 0.65));
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      backdrop-filter: blur(2px);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Fraunces", "Iowan Old Style", serif;
+      font-size: clamp(1.7rem, 3.1vw, 2.5rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      margin: 0.65rem 0 0;
+      color: var(--ink-muted);
+      max-width: 70ch;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.7rem 0.85rem;
+    }
+
+    .stat .label {
+      color: var(--ink-muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stat .value {
+      margin-top: 0.22rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    #status {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      margin-top: 0.7rem;
+      min-height: 1.2rem;
+    }
+
+    .local-loader {
+      margin-top: 0.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .local-loader label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 10px;
+      padding: 0.5rem 0.85rem;
+      font-weight: 600;
+      font-size: 0.87rem;
+      cursor: pointer;
+    }
+
+    .local-loader label:hover {
+      filter: brightness(1.05);
+    }
+
+    .local-loader input {
+      display: none;
+    }
+
+    .local-loader .hint {
+      color: var(--ink-muted);
+      font-size: 0.85rem;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 0.95rem;
+    }
+
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 1rem;
+      animation: rise 420ms ease both;
+    }
+
+    .chart-title {
+      margin: 0;
+      font-size: 1.02rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .chart-subtitle {
+      margin: 0.2rem 0 0.7rem;
+      color: var(--ink-muted);
+      font-size: 0.88rem;
+    }
+
+    .bars {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .bar-row {
+      display: grid;
+      gap: 0.3rem;
+    }
+
+    .bar-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      font-size: 0.88rem;
+    }
+
+    .bar-label {
+      font-weight: 500;
+    }
+
+    .bar-value {
+      color: var(--ink-muted);
+      white-space: nowrap;
+    }
+
+    .bar-track {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #1158ea, #3f81ff);
+      transform-origin: left;
+      animation: grow 700ms cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    .error {
+      color: #8b1e2f;
+      font-weight: 600;
+    }
+
+    @keyframes grow {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="dashboard">
+    <section class="hero">
+      <h1>Survey Response Distribution</h1>
+      <p>Category-level breakdown of current survey data from <code>data.json</code>.</p>
+      <div class="stats" id="stats"></div>
+      <div id="status" aria-live="polite"></div>
+      <div class="local-loader" id="localLoader" hidden>
+        <label for="jsonFileInput">Load data.json</label>
+        <input id="jsonFileInput" type="file" accept=".json,application/json" />
+        <span class="hint">Use this when opening this page via <code>file://</code>.</span>
+      </div>
+    </section>
+
+    <section class="chart-grid" id="chartGrid"></section>
+  </main>
+
+  <script>
+    const EXCLUDED_KEYS = new Set(["id", "name", "email", "funFact"]);
+    const FIELD_LABELS = {
+      openSeat: "I would offer an open seat to someone else",
+      connectionDifficulty: "I find it this difficult to connect with new people",
+      accessToNewPeople: "How difficult do you find it to make new friends or meaningful connections outside of the people you already know?"
+    };
+    const FIELD_VALUE_OVERRIDES = {
+      accessToNewPeople: {
+        Easy: "Very DIfficult",
+        "N/A": "Easy",
+        "Very Difficult": "N/A"
+      }
+    };
+
+    const chartGrid = document.getElementById("chartGrid");
+    const statusEl = document.getElementById("status");
+    const statsEl = document.getElementById("stats");
+    const localLoaderEl = document.getElementById("localLoader");
+    const jsonFileInputEl = document.getElementById("jsonFileInput");
+
+    const titleCase = (text) => text
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (s) => s.toUpperCase())
+      .trim();
+    const displayFieldLabel = (fieldName) => FIELD_LABELS[fieldName] || titleCase(fieldName);
+    const mapFieldValue = (fieldName, value) => {
+      const overrides = FIELD_VALUE_OVERRIDES[fieldName];
+      if (!overrides) return value;
+      return Object.prototype.hasOwnProperty.call(overrides, value)
+        ? overrides[value]
+        : value;
+    };
+
+    const formatDateTime = (isoValue) => {
+      if (!isoValue) return "N/A";
+      const dt = new Date(isoValue);
+      if (Number.isNaN(dt.getTime())) return "N/A";
+      return dt.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    };
+
+    const normalizeRows = (raw) => {
+      if (Array.isArray(raw)) return raw;
+      if (raw && Array.isArray(raw.submissions)) return raw.submissions;
+      return [];
+    };
+
+    const getDistribution = (rows, key) => {
+      const counts = new Map();
+      for (const row of rows) {
+        const raw = row?.[key];
+        const normalized = raw === null || raw === undefined || String(raw).trim() === ""
+          ? "(blank)"
+          : String(raw).trim();
+        const value = mapFieldValue(key, normalized);
+        counts.set(value, (counts.get(value) || 0) + 1);
+      }
+
+      return [...counts.entries()]
+        .map(([label, count]) => ({ label, count }))
+        .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+    };
+
+    const findCategoricalFields = (rows) => {
+      const keys = new Set(rows.flatMap((row) => Object.keys(row || {})));
+      return [...keys].filter((key) => {
+        if (EXCLUDED_KEYS.has(key) || key === "createdAt") return false;
+        const unique = new Set();
+        let nonEmpty = 0;
+
+        for (const row of rows) {
+          const value = row?.[key];
+          if (value === null || value === undefined || String(value).trim() === "") continue;
+          nonEmpty += 1;
+          unique.add(String(value).trim());
+        }
+
+        if (nonEmpty === 0) return false;
+        return unique.size <= 15;
+      });
+    };
+
+    const renderStats = (rows, fields) => {
+      const latest = rows
+        .map((row) => row?.createdAt)
+        .filter(Boolean)
+        .sort()
+        .pop();
+
+      const stats = [
+        { label: "Total Responses", value: rows.length.toLocaleString() },
+        { label: "Fields Visualized", value: String(fields.length) },
+        { label: "Latest Submission", value: formatDateTime(latest) }
+      ];
+
+      statsEl.replaceChildren();
+      for (const stat of stats) {
+        const card = document.createElement("article");
+        card.className = "stat";
+
+        const label = document.createElement("div");
+        label.className = "label";
+        label.textContent = stat.label;
+
+        const value = document.createElement("div");
+        value.className = "value";
+        value.textContent = stat.value;
+
+        card.append(label, value);
+        statsEl.append(card);
+      }
+    };
+
+    const renderChart = (fieldName, dist, totalRows) => {
+      const card = document.createElement("article");
+      card.className = "chart-card";
+
+      const title = document.createElement("h2");
+      title.className = "chart-title";
+      title.textContent = displayFieldLabel(fieldName);
+
+      const subtitle = document.createElement("p");
+      subtitle.className = "chart-subtitle";
+      subtitle.textContent = `${dist.length} ${dist.length === 1 ? "category" : "categories"}`;
+
+      const bars = document.createElement("div");
+      bars.className = "bars";
+
+      const maxCount = dist[0]?.count || 1;
+
+      for (const item of dist) {
+        const row = document.createElement("div");
+        row.className = "bar-row";
+
+        const meta = document.createElement("div");
+        meta.className = "bar-meta";
+
+        const label = document.createElement("span");
+        label.className = "bar-label";
+        label.textContent = item.label;
+
+        const value = document.createElement("span");
+        value.className = "bar-value";
+        const pct = ((item.count / totalRows) * 100).toFixed(1);
+        value.textContent = `${item.count} (${pct}%)`;
+
+        meta.append(label, value);
+
+        const track = document.createElement("div");
+        track.className = "bar-track";
+
+        const fill = document.createElement("div");
+        fill.className = "bar-fill";
+        fill.style.width = `${(item.count / maxCount) * 100}%`;
+
+        track.append(fill);
+        row.append(meta, track);
+        bars.append(row);
+      }
+
+      card.append(title, subtitle, bars);
+      return card;
+    };
+
+    const setError = (message) => {
+      statusEl.textContent = message;
+      statusEl.classList.add("error");
+    };
+
+    const renderFromRaw = (raw, sourceLabel = "data.json") => {
+      const rows = normalizeRows(raw);
+
+      if (!rows.length) {
+        setError("No survey rows found in data.");
+        return;
+      }
+
+      const fields = findCategoricalFields(rows);
+      renderStats(rows, fields);
+
+      chartGrid.replaceChildren();
+      for (const [idx, field] of fields.entries()) {
+        const distribution = getDistribution(rows, field);
+        const card = renderChart(field, distribution, rows.length);
+        card.style.animationDelay = `${idx * 80}ms`;
+        chartGrid.append(card);
+      }
+
+      statusEl.classList.remove("error");
+      statusEl.textContent = `Loaded ${rows.length} response${rows.length === 1 ? "" : "s"} from ${sourceLabel}.`;
+
+      if (!fields.length) {
+        setError("No categorical fields met visualization criteria.");
+      }
+    };
+
+    async function loadAndRender() {
+      if (window.location.protocol === "file:") {
+        statusEl.classList.remove("error");
+        statusEl.textContent = "Local file mode detected. Choose data.json below.";
+        localLoaderEl.hidden = false;
+        return;
+      }
+
+      try {
+        statusEl.textContent = "Loading survey data...";
+        const response = await fetch("./data.json", { cache: "no-store" });
+        if (!response.ok) throw new Error(`Failed to load data.json (${response.status})`);
+        const raw = await response.json();
+        renderFromRaw(raw, "data.json");
+      } catch (err) {
+        setError("Could not load data.json automatically.");
+        localLoaderEl.hidden = false;
+        console.error(err);
+      }
+    }
+
+    jsonFileInputEl.addEventListener("change", async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      try {
+        statusEl.classList.remove("error");
+        statusEl.textContent = `Reading ${file.name}...`;
+        const text = await file.text();
+        const raw = JSON.parse(text);
+        renderFromRaw(raw, file.name);
+      } catch (err) {
+        setError(`Could not parse ${file.name}. Make sure it is valid JSON.`);
+        console.error(err);
+      }
+    });
+
+    loadAndRender();
+  </script>
+</body>
+</html>

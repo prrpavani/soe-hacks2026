@@ -108,7 +108,9 @@ export default function AdminPage() {
   };
 
   async function loadDashboard(nextPassword = password) {
-    const response = await fetch(`/api/submissions?password=${encodeURIComponent(nextPassword)}`);
+    const response = await fetch(`/api/submissions?password=${encodeURIComponent(nextPassword)}`, {
+      cache: "no-store",
+    });
     const payload = await response.json();
 
     if (!response.ok) {
