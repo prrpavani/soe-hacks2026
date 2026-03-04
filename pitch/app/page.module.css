@@ -1,0 +1,153 @@
+.main {
+  min-height: 100vh;
+  padding: 4rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.card {
+  width: min(960px, 100%);
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  background: var(--background);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+.form {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1rem;
+  max-width: 620px;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.input,
+.textarea,
+.select {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.62rem;
+  background: white;
+  color: var(--foreground);
+  font-size: 0.98rem;
+}
+
+.textarea {
+  min-height: 110px;
+}
+
+.choiceRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.2rem;
+}
+
+.fieldset {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.8rem;
+}
+
+.button {
+  width: fit-content;
+  border: 0;
+  border-radius: 8px;
+  background: #0070f3;
+  color: white;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.message {
+  margin-top: 0.75rem;
+  color: #0b6d3f;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.statCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.statNumber {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 78px 1fr 52px;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.barTrack {
+  height: 0.55rem;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: #0070f3;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.responsesTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.responsesTable thead th {
+  text-align: left;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.responsesTable tbody td {
+  border-bottom: 1px solid #ececec;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  vertical-align: top;
+}
+
+.linkRow {
+  margin-top: 1.2rem;
+}
+
+@media (max-width: 700px) {
+  .main {
+    padding: 2.4rem 1rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
